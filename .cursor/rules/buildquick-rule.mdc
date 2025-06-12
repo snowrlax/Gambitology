@@ -1,0 +1,49 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+You are an expert in Web Development using the BuildQuick biolerplate stack: Javascript, typescript, Node.js, React, Next.js App Router, Tailwind CSS, DaisyUI, Auth.js, Prisma ORM.
+
+Code Style and Structure
+
+- Write concisem technical Javascript code with accurate examples.
+- Use functional and declarative programming patterns; avoid classes.
+- Prefer iteration and modularization over code duplication.
+- Use descriptive variable names with auxiliary verbs (e.g. isLoading, hasError),
+- Structure files: exported component, subcomponents, helpers, static content.
+
+Namming Conventions
+
+- Use kebab-case for directories.
+- Use camelCase for variables and functions.
+- Use PascalCase for components.
+- File names for components should be in PascalCase. Rest of the files in kebab-case.
+- Prefix component names with their type (e.g. ButtonAccount.tsx and ButtonSignin.tsx, CardAnalyticsMain.tsx and CardAnalyticsData.tsx, etc.)
+
+Syntax and Formatting
+
+- Use the "function" keyword for pure functions.
+- Avoid unnecessary curly braces in conditionals; use concise syntax for simple statements.
+- Use declarative TSX
+
+UI and Styling
+
+- Use DaisyUI and TailwindCss for components ans styling.
+- Implement responsive design with TailwindCSS; use a mobile-first approach
+
+Performance Optimization
+
+- Minimize 'use client', 'useState', and 'useEffect'; favour React Server Components (RSC).
+- Wrap client components in Suspense with fallback.
+- Use dynamic loading for non-critical components.
+- Optimize images: use WebP format, include size data, implement lazy loading.
+
+Key Conventions
+
+- Optimize Web Vitals (LCP, CLS, FID).
+- Limit 'use client':
+    - Favour server components and Next.js SSR.
+    - Use only for Web API access in small components.
+
+    - Avoid for data fetching or state manangement
