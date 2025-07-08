@@ -1,15 +1,20 @@
-import Image from "next/image";
-import WaitlistForm from "@/components/waitlist-form";
-import FeatureCard from "@/components/feature-card";
+'use client'
+
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 
-import prisma from "@/lib/db";
 import { Terminal } from "@/components/terminal";
 import { OutlineButton } from "@/components/ui/buttons";
 import { Card } from "@/components/ui/card";
+import { useEffect } from "react";
+import axios from "axios";
 
 export default function Home() {
+
+  useEffect(() => {
+    axios.post('/api/events')
+  }, []);
+
   return (
     <main>
       <Navbar />

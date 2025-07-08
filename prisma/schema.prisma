@@ -7,36 +7,257 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+type Location {
+  ip                   String
+  network              String
+  version              String
+  city                 String
+  region               String
+  region_code          String
+  country              String
+  country_name         String
+  country_code         String
+  country_code_iso3    String
+  country_capital      String
+  country_tld          String
+  continent_code       String
+  in_eu                Boolean
+  postal               String
+  latitude             Int
+  longitude            Int
+  timezone             String
+  utc_offset           String
+  country_calling_code String
+  currency             String
+  currency_name        String
+  languages            String
+  country_area         Int
+  country_population   Int
+  asn                  String
+  org                  String
+}
+
+model Visitor {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  ipAddress String
+  location  Location
+  device    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Tenant {
+  id      String   @id @default(auto()) @map("_id") @db.ObjectId
+  name    String
+  slug    String   @unique
+  users   User[]   @relation("TenantUsers")
+  gambits Gambit[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model User {
   id            String    @id @default(auto()) @map("_id") @db.ObjectId
   name          String?
   email         String?   @unique
   image         String?
   emailVerified DateTime?
-  password      String?  
+  password      String?
   accounts      Account[]
   sessions      Session[]
   otpSecret     String?
   otpExpiry     DateTime?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+
+  // Gambitology fields
+  tenantId      String?   @db.ObjectId
+  tenant        Tenant?   @relation(fields: [tenantId], references: [id], name: "TenantUsers")
+  role          Role      @default(USER)
+  
+  // Training progress tracking
+  userProgress  UserProgress[]
+  trainingStats TrainingStats[]
+  
+  // Subscription management
+  subscriptionStatus SubscriptionStatus @default(FREE)
+  subscriptionExpiry DateTime?
+  stripeCustomerId   String?
+}
+
+enum Role {
+  USER
+  AUTHOR
+  ADMIN
+}
+
+enum SubscriptionStatus {
+  FREE
+  BASIC
+  PREMIUM
+  LIFETIME
+}
+
+enum OpeningType {
+  GAMBIT
+  OPENING
+  DEFENSE
+  TRAP
+}
+
+enum Difficulty {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+  EXPERT
+}
+
+model Gambit {
+  id          String      @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  slug        String      @unique
+  description String?
+  eco         String?     // ECO code (e.g., "B06" for Modern Defense)
+  openingType OpeningType @default(GAMBIT)
+  difficulty  Difficulty  @default(BEGINNER)
+  color       String      // "white" or "black" - which side plays the gambit
+  
+  tenantId    String      @db.ObjectId
+  tenant      Tenant      @relation(fields: [tenantId], references: [id])
+  lines       Line[]
+  tags        String[]    // Tags for categorization
+  
+  published   Boolean     @default(false)
+  featured    Boolean     @default(false)
+  premium     Boolean     @default(false) // Premium content flag
+  
+  // Statistics
+  totalMoves  Int         @default(0)
+  playCount   Int         @default(0)
+  
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  
+  // User progress tracking
+  userProgress UserProgress[]
+}
+
+model Line {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  gambitId     String   @db.ObjectId
+  gambit       Gambit   @relation(fields: [gambitId], references: [id], onDelete: Cascade)
+  
+  title        String
+  description  String?
+  startingFEN  String   @default("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
+  
+  moves        Move[]
+  
+  // Line metadata
+  isMainLine   Boolean  @default(true)
+  difficulty   Difficulty @default(BEGINNER)
+  moveCount    Int      @default(0)
+  
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  // User progress tracking
+  userProgress UserProgress[]
+}
+
+model Move {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  lineId     String   @db.ObjectId
+  line       Line     @relation(fields: [lineId], references: [id], onDelete: Cascade)
+  
+  ply        Int      // Move number (1, 2, 3, etc.)
+  san        String   // Standard Algebraic Notation (e.g., "Nf3")
+  uci        String   // Universal Chess Interface (e.g., "g1f3")
+  fenAfter   String   // FEN position after this move
+  
+  // Move annotations
+  annotation String?  // Text explanation of the move
+  isKey      Boolean  @default(false) // Is this a key move in the gambit?
+  isCorrect  Boolean  @default(true)  // For training validation
+  
+  // Tree structure for variations
+  parentId   String?  @db.ObjectId
+  parent     Move?    @relation("MoveBranch", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  children   Move[]   @relation("MoveBranch")
+  
+  // Move ordering within a position
+  sortOrder  Int      @default(0)
+  
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+// User progress tracking for each gambit/line
+model UserProgress {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  gambitId  String?  @db.ObjectId
+  gambit    Gambit?  @relation(fields: [gambitId], references: [id], onDelete: Cascade)
+  
+  lineId    String?  @db.ObjectId
+  line      Line?    @relation(fields: [lineId], references: [id], onDelete: Cascade)
+  
+  // Progress metrics
+  correctMoves    Int     @default(0)
+  totalAttempts   Int     @default(0)
+  accuracy        Float   @default(0) // percentage
+  bestStreak      Int     @default(0)
+  currentStreak   Int     @default(0)
+  
+  // Learning status
+  mastered        Boolean @default(false)
+  lastPracticed   DateTime?
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@unique([userId, gambitId, lineId])
+}
+
+// Training session statistics
+model TrainingStats {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId          String   @db.ObjectId
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  sessionDate     DateTime @default(now())
+  
+  // Session metrics
+  totalMoves      Int      @default(0)
+  correctMoves    Int      @default(0)
+  incorrectMoves  Int      @default(0)
+  sessionAccuracy Float    @default(0)
+  timeSpent       Int      @default(0) // in seconds
+  
+  // Gambits practiced in this session
+  gambitsPlayed   String[] // Array of gambit IDs
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }
 
 model Account {
-  id                   String  @id @default(auto()) @map("_id") @db.ObjectId
-  userId               String  @db.ObjectId
-  type                 String
-  provider             String
-  providerAccountId    String
-  refresh_token        String?
-  access_token         String?
-  expires_at           Int?
-  token_type           String?
-  scope                String?
-  id_token             String?
-  session_state        String?
-  user                 User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+  id                String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String  @db.ObjectId
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@unique([provider, providerAccountId])
 }
 
