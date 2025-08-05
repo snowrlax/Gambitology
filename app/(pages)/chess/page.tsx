@@ -119,12 +119,18 @@ const ChessGame = () => {
             // Use the NEW index to set the next expected move
             setExpectedMove(newMoveIndex < pgnMoves.length ? pgnMoves[newMoveIndex] : '');
             setGame(chessGame.fen());
+            
+            // Return both the result and the new move index for CPU move
+            return { moveResult: result, newMoveIndex };
         }
-        return result;
+        return null;
     }
 
-    function makePGNMove() {
-        if (currentMoveIndex >= pgnMoves.length) {
+    function makePGNMove(moveIndex?: number) {
+        // Use provided moveIndex or current state
+        const indexToUse = moveIndex !== undefined ? moveIndex : currentMoveIndex;
+        
+        if (indexToUse >= pgnMoves.length) {
             setErrorMessage("Game has reached the end of the predefined line.");
             return;
         }
@@ -132,13 +138,14 @@ const ChessGame = () => {
         if (chessGame.isGameOver() || chessGame.isDraw())
             return; // exit if the game is over
 
-        const expectedMoveNotation = pgnMoves[currentMoveIndex];
+        const expectedMoveNotation = pgnMoves[indexToUse];
 
         // Find the move that matches the expected PGN notation
         const possibleMoves = chessGame.moves({ verbose: true });
 
         console.log("possibleMoves for CPU:", possibleMoves.map(m => m.san));
         console.log("expectedMoveNotation:", expectedMoveNotation);
+        console.log("using move index:", indexToUse);
 
         const matchingMove = possibleMoves.find(move => move.san === expectedMoveNotation);
 
@@ -147,7 +154,7 @@ const ChessGame = () => {
         if (matchingMove) {
             const result = chessGame.move(matchingMove);
             if (result) {
-                const newMoveIndex = currentMoveIndex + 1;
+                const newMoveIndex = indexToUse + 1;
                 setCurrentMoveIndex(newMoveIndex);
                 // Use the NEW index to set the next expected move
                 setExpectedMove(newMoveIndex < pgnMoves.length ? pgnMoves[newMoveIndex] : '');
@@ -264,8 +271,8 @@ const ChessGame = () => {
             return;
         }
 
-        // make PGN-based cpu move after a short delay
-        setTimeout(makePGNMove, 300);
+        // make PGN-based cpu move after a short delay using the updated move index
+        setTimeout(() => makePGNMove(moveResult.newMoveIndex), 300);
 
         // clear moveFrom and optionSquares
         setMoveFrom('');
@@ -291,8 +298,8 @@ const ChessGame = () => {
             setMoveFrom('');
             setOptionSquares({});
 
-            // make PGN-based cpu move after a short delay
-            setTimeout(makePGNMove, 500);
+            // make PGN-based cpu move after a short delay using the updated move index
+            setTimeout(() => makePGNMove(move.newMoveIndex), 500);
 
             // return true as the move was successful
             return true;
