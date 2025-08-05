@@ -54,6 +54,8 @@ const ChessGame = () => {
         console.log("expectedMove", expectedMove);
     }, [pgnMoves, currentMoveIndex, expectedMove]);
 
+
+    // yo this is stupid
     function makeAMove(move: any) {
         const result = chessGame.move(move);
         setGame(chessGame.fen());
