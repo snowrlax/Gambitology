@@ -19,6 +19,13 @@ const ChessGame = () => {
         "9. O-O O-O"
     ];
 
+    const scholarsMatePGN = [
+        "1. e4 e5",
+        "2. Qh5 Nc6",
+        "3. Bc4 Nf6",
+        "4. Qxf7#"
+    ];
+
     // Parse PGN into individual moves
     const parsePGNMoves = (pgnArray: string[]) => {
         const moves: string[] = [];
@@ -31,7 +38,7 @@ const ChessGame = () => {
         return moves;
     };
 
-    const pgnMoves = parsePGNMoves(italianGamePGN);
+    const pgnMoves = parsePGNMoves(scholarsMatePGN);
 
 
 

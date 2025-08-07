@@ -1,188 +1,561 @@
 'use client'
 
-import Navbar from "@/components/navbar";
-import Footer from "@/components/footer";
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { ChevronRight, Github, Twitter, Play, Users, Trophy, BookOpen, Star, ArrowRight } from 'lucide-react'
+import Link from "next/link"
+import { motion } from "framer-motion"
 
-import { Terminal } from "@/components/terminal";
-import { OutlineButton } from "@/components/ui/buttons";
-import { Card } from "@/components/ui/card";
-import { useEffect } from "react";
-import axios from "axios";
+const chessOpenings = [
+  {
+    name: "Sicilian Defense",
+    description: "Master the most popular opening in chess. Create imbalanced positions and fight for the initiative.",
+    lines: 25,
+    difficulty: "Advanced",
+    image: "./images/placeholder-e8alj.png"
+  },
+  {
+    name: "Queen's Gambit",
+    description: "Control the center with classical principles. Perfect for positional players seeking strategic depth.",
+    lines: 18,
+    difficulty: "Intermediate",
+    image: "./images/chess-queens-gambit.png"
+  },
+  {
+    name: "King's Indian Defense",
+    description: "Turn defense into attack with dynamic counterplay. Master the art of strategic patience.",
+    lines: 22,
+    difficulty: "Advanced",
+    image: "./images/chess-board-kings-indian.png"
+  },
+  {
+    name: "Italian Game",
+    description: "Learn fundamental opening principles. Perfect introduction to center control and development.",
+    lines: 12,
+    difficulty: "Beginner",
+    image: "./images/chess-italian-game.png"
+  }
+]
 
-export default function Home() {
+const testimonials = [
+  // Row 1
+  {
+    name: "Magnus C.",
+    username: "@magnuschess",
+    avatar: "./images/chess-player-avatar.png",
+    content: "This chess trainer helped me improve my opening repertoire significantly. The interactive lessons are fantastic!"
+  },
+  {
+    name: "Hikaru N.",
+    username: "@hikarunakamura",
+    avatar: "./images/chess-streamer-avatar.png",
+    content: "Finally, a chess training platform that makes learning openings actually fun. My viewers love it too!"
+  },
+  {
+    name: "Anna R.",
+    username: "@chessqueen",
+    avatar: "./images/female-chess-player-avatar.png",
+    content: "The spaced repetition system is genius. I've memorized more opening lines in a month than in years of study."
+  },
+  {
+    name: "Garry K.",
+    username: "@garryking",
+    avatar: "./images/chess-grandmaster-avatar.png",
+    content: "Excellent tool for both beginners and masters. The analysis depth is impressive."
+  },
+  {
+    name: "Beth H.",
+    username: "@bethharmony",
+    avatar: "./images/chess-prodigy-avatar.png",
+    content: "This platform revolutionized how I prepare for tournaments. Highly recommended!"
+  },
+  {
+    name: "Fabiano C.",
+    username: "@fabianocaruana",
+    avatar: "./images/chess-player-avatar.png",
+    content: "The opening preparation tools are world-class. Perfect for serious competitive players."
+  },
+  // Row 2
+  {
+    name: "Alexandra B.",
+    username: "@alexchess",
+    avatar: "./images/female-chess-player-avatar.png",
+    content: "Love how intuitive the interface is. Makes studying complex variations actually enjoyable."
+  },
+  {
+    name: "Daniel N.",
+    username: "@danielking",
+    avatar: "./images/chess-grandmaster-avatar.png",
+    content: "The best chess training platform I've used. The progress tracking keeps me motivated."
+  },
+  {
+    name: "Judit P.",
+    username: "@juditpolgar",
+    avatar: "./images/female-chess-player-avatar.png",
+    content: "Incredible depth of analysis. This tool has become essential for my chess improvement."
+  },
+  {
+    name: "Wesley S.",
+    username: "@wesleyso",
+    avatar: "./images/chess-player-avatar.png",
+    content: "The interactive lessons make learning openings so much more effective than books."
+  },
+  {
+    name: "Hou Y.",
+    username: "@houyifan",
+    avatar: "./images/female-chess-player-avatar.png",
+    content: "Perfect for building a solid opening repertoire. The spaced repetition really works!"
+  },
+  {
+    name: "Levon A.",
+    username: "@levonaronian",
+    avatar: "./images/chess-grandmaster-avatar.png",
+    content: "This platform has everything a chess player needs to master openings systematically."
+  },
+  // Row 3
+  {
+    name: "Maxime V.",
+    username: "@maximevachier",
+    avatar: "./images/chess-player-avatar.png",
+    content: "The quality of analysis rivals the best chess engines. Absolutely brilliant platform."
+  },
+  {
+    name: "Koneru H.",
+    username: "@konerhumpy",
+    avatar: "./images/female-chess-player-avatar.png",
+    content: "Finally found a tool that makes opening study systematic and fun. Game changer!"
+  },
+  {
+    name: "Anish G.",
+    username: "@anishgiri",
+    avatar: "./images/chess-grandmaster-avatar.png",
+    content: "The interactive approach to learning openings is revolutionary. Highly recommend!"
+  },
+  {
+    name: "Kateryna L.",
+    username: "@katerynalagno",
+    avatar: "./images/female-chess-player-avatar.png",
+    content: "This platform transformed my opening preparation. The results speak for themselves."
+  },
+  {
+    name: "Ian N.",
+    username: "@iannepo",
+    avatar: "./images/chess-player-avatar.png",
+    content: "Incredible tool for serious chess improvement. The lesson quality is outstanding."
+  },
+  {
+    name: "Mariya M.",
+    username: "@mariyamuzychuk",
+    avatar: "./images/female-chess-player-avatar.png",
+    content: "Perfect balance of theory and practice. This is how chess should be taught!"
+  }
+]
 
-  useEffect(() => {
-    axios.post('/api/events')
-  }, []);
+// Split testimonials into three rows
+const testimonialRows = [
+  testimonials.slice(0, 6),
+  testimonials.slice(6, 12),
+  testimonials.slice(12, 18)
+]
 
+
+const features = [
+  {
+    icon: BookOpen,
+    title: "Interactive Lessons",
+    description: "Learn with hands-on practice and immediate feedback"
+  },
+  {
+    icon: Users,
+    title: "500,000+ Players",
+    description: "Join a thriving community of chess enthusiasts"
+  },
+  {
+    icon: Trophy,
+    title: "Tournament Prep",
+    description: "Prepare for competitions with grandmaster-level analysis"
+  }
+]
+
+export default function ChessTrainerLanding() {
   return (
-    <main>
-      <Navbar />
-      {/* Hero Section */}
-      <section className="bg-base-200 py-20">
-        <div className="flex max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 justify-between">
-          <div className="sm:text-center md:max-w-2xl lg:col-span-6 lg:text-left">
-            <h1 className="text-4xl font-bold text-base-content tracking-tight sm:text-5xl md:text-6xl">
-              Build Your SaaS
-              <span className="block text-primary-content">
-                Faster Than Ever
-              </span>
-            </h1>
-            <p className="mt-3 text-base text-base-content/70 sm:mt-5 sm:text-xl lg:text-lg xl:text-xl">
-              Launch your SaaS product in record time with our powerful,
-              ready-to-use template. Packed with modern technologies and
-              essential integrations.
-            </p>
-            <div className="mt-8 sm:max-w-lg sm:mx-auto sm:text-center lg:text-left lg:mx-0">
-              <a
-                href="https://vercel.com/templates/next.js/next-js-saas-starter"
-                target="_blank"
-              >
-                <OutlineButton size="lg">
-                  Deploy your own
-                  <svg
-                    className="ml-2 h-5 w-5"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M17 8l4 4m0 0l-4 4m4-4H3"
-                    />
-                  </svg>
-                </OutlineButton>
-              </a>
+    <div className="min-h-screen bg-black text-white">
+      {/* Header */}
+      <header className="border-b border-gray-800 bg-black/50 backdrop-blur-sm sticky top-0 z-50">
+        <div className="container mx-auto px-4 lg:px-6 h-16 flex items-center justify-between">
+          <Link href="/" className="flex items-center space-x-2">
+            <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
+              <span className="text-black font-bold text-lg">♔</span>
             </div>
+            <span className="font-bold text-xl">Gambitology</span>
+          </Link>
+          
+          <nav className="hidden md:flex items-center space-x-6">
+            <Link href="#openings" className="text-gray-300 hover:text-white transition-colors">
+              Openings
+            </Link>
+            <Link href="#features" className="text-gray-300 hover:text-white transition-colors">
+              Features
+            </Link>
+            <Link href="#testimonials" className="text-gray-300 hover:text-white transition-colors">
+              Reviews
+            </Link>
+            <Link href="#pricing" className="text-gray-300 hover:text-white transition-colors">
+              Pricing
+            </Link>
+          </nav>
+
+          <div className="flex items-center space-x-4">
+            
+            <Button className="bg-green-500 hover:bg-green-600 text-black font-medium">
+              Start Training
+              <ChevronRight className="w-4 h-4 ml-1" />
+            </Button>
           </div>
-          <div className="mt-12 relative sm:max-w-lg sm:mx-auto lg:mt-0 lg:max-w-none lg:mx-0 lg:col-span-6 lg:flex lg:items-center">
-            <Terminal />
+        </div>
+      </header>
+
+      {/* Hero Section */}
+      <section className="py-20 lg:py-32 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 via-transparent to-transparent" />
+        <div className="container mx-auto px-4 lg:px-6 relative">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="space-y-8"
+            >
+              <div className="space-y-4">
+                <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
+                  ✓ Interactive Chess Training
+                </Badge>
+                <h1 className="text-4xl lg:text-6xl font-bold leading-tight">
+                  Master Your
+                  <span className="block text-green-400 italic">Chess Openings</span>
+                  Like a Pro
+                </h1>
+                <p className="text-xl text-gray-400 max-w-lg">
+                  Master chess openings with interactive lessons and spaced repetition. 
+                  Build your winning repertoire faster than ever.
+                </p>
+              </div>
+              
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Button size="lg" className="bg-green-500 hover:bg-green-600 text-black font-medium">
+                  <Play className="w-5 h-5 mr-2" />
+                  Start Training
+                </Button>
+                <Button size="lg" variant="outline" className="border-green-500/30 text-green-400 hover:bg-green-500/10">
+                  View Openings
+                </Button>
+              </div>
+
+              <div className="flex items-center space-x-8 pt-4">
+                {features.map((feature, index) => (
+                  <div key={index} className="flex items-center space-x-2 text-sm text-gray-400">
+                    <feature.icon className="w-4 h-4 text-green-400" />
+                    <span>{feature.title}</span>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="relative"
+            >
+              <div className="bg-gray-900 rounded-2xl p-6 border border-gray-800">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex space-x-2">
+                    <div className="w-3 h-3 bg-red-500 rounded-full" />
+                    <div className="w-3 h-3 bg-yellow-500 rounded-full" />
+                    <div className="w-3 h-3 bg-green-500 rounded-full" />
+                  </div>
+                  <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
+                    Live Training
+                  </Badge>
+                </div>
+                
+                <div className="space-y-4">
+                  <div className="bg-black/50 rounded-lg p-4">
+                    <div className="grid grid-cols-8 gap-1 mb-4">
+                      {Array.from({ length: 64 }).map((_, i) => (
+                        <div
+                          key={i}
+                          className={`aspect-square rounded-sm ${
+                            (Math.floor(i / 8) + i) % 2 === 0 ? 'bg-amber-100' : 'bg-amber-800'
+                          }`}
+                        />
+                      ))}
+                    </div>
+                    <div className="text-sm text-gray-400">
+                      <div className="flex justify-between items-center">
+                        <span>Sicilian Defense - Najdorf Variation</span>
+                        <span className="text-green-400">85% accuracy</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-400">Progress</span>
+                    <span className="text-green-400">12/25 lines mastered</span>
+                  </div>
+                  <div className="w-full bg-gray-800 rounded-full h-2">
+                    <div className="bg-green-500 h-2 rounded-full" style={{ width: '48%' }} />
+                  </div>
+                </div>
+              </div>
+            </motion.div>
           </div>
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="py-16 bg-base-100 w-full">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-3 gap-8">
-            {/* Feature 1 */}
-            <Card>
-              <div className="flex items-center justify-center h-12 w-12 rounded-md bg-orange-500 text-white mt-6 ml-6">
-                {/* Next.js/React SVG */}
-                <svg
-                  viewBox="0 0 24 24"
-                  className="h-6 w-6"
-                  fill="currentColor"
-                >
-                  <path d="M14.23 12.004a2.236 2.236 0 0 1-2.235 2.236 2.236 2.236 0 0 1-2.236-2.236 2.236 2.236 0 0 1 2.235-2.236 2.236 2.236 0 0 1 2.236 2.236zm2.648-10.69c-1.346 0-3.107.96-4.888 2.622-1.78-1.653-3.542-2.602-4.887-2.602-.41 0-.783.093-1.106.278-1.375.793-1.683 3.264-.973 6.365C1.98 8.917 0 10.42 0 12.004c0 1.59 1.99 3.097 5.043 4.03-.704 3.113-.39 5.588.988 6.38.32.187.69.275 1.102.275 1.345 0 3.107-.96 4.888-2.624 1.78 1.654 3.542 2.603 4.887 2.603.41 0 .783-.09 1.106-.275 1.374-.792 1.683-3.263.973-6.365C22.02 15.096 24 13.59 24 12.004c0-1.59-1.99-3.097-5.043-4.032.704-3.11.39-5.587-.988-6.38-.318-.184-.688-.277-1.092-.278zm-.005 1.09v.006c.225 0 .406.044.558.127.666.382.955 1.835.73 3.704-.054.46-.142.945-.25 1.44-.96-.236-2.006-.417-3.107-.534-.66-.905-1.345-1.727-2.035-2.447 1.592-1.48 3.087-2.292 4.105-2.295zm-9.77.02c1.012 0 2.514.808 4.11 2.28-.686.72-1.37 1.537-2.02 2.442-1.107.117-2.154.298-3.113.538-.112-.49-.195-.964-.254-1.42-.23-1.868.054-3.32.714-3.707.19-.09.4-.127.563-.132zm4.882 3.05c.455.468.91.992 1.36 1.564-.44-.02-.89-.034-1.345-.034-.46 0-.915.01-1.36.034.44-.572.895-1.096 1.345-1.565zM12 8.1c.74 0 1.477.034 2.202.093.406.582.802 1.203 1.183 1.86.372.64.71 1.29 1.018 1.946-.308.655-.646 1.31-1.013 1.95-.38.66-.773 1.288-1.18 1.87-.728.063-1.466.098-2.21.098-.74 0-1.477-.035-2.202-.093-.406-.582-.802-1.204-1.183-1.86-.372-.64-.71-1.29-1.018-1.946.303-.657.646-1.313 1.013-1.954.38-.66.773-1.286 1.18-1.868.728-.064 1.466-.098 2.21-.098zm-3.635.254c-.24.377-.48.763-.704 1.16-.225.39-.435.782-.635 1.174-.265-.656-.49-1.31-.676-1.947.64-.15 1.315-.283 2.015-.386zm7.26 0c.695.103 1.365.23 2.006.387-.18.632-.405 1.282-.66 1.933-.2-.39-.41-.783-.64-1.174-.225-.392-.465-.774-.705-1.146zm3.063.675c.484.15.944.317 1.375.498 1.732.74 2.852 1.708 2.852 2.476-.005.768-1.125 1.74-2.857 2.475-.42.18-.88.342-1.355.493-.28-.958-.646-1.956-1.1-2.98.45-1.017.81-2.01 1.085-2.964zm-13.395.004c.278.96.645 1.957 1.1 2.98-.45 1.017-.812 2.01-1.086 2.964-.484-.15-.944-.318-1.37-.5-1.732-.737-2.852-1.706-2.852-2.474 0-.768 1.12-1.742 2.852-2.476.42-.18.88-.342 1.356-.494zm11.678 4.28c.265.657.49 1.312.676 1.948-.64.157-1.316.29-2.016.39.24-.375.48-.762.705-1.158.225-.39.435-.788.636-1.18zm-9.945.02c.2.392.41.783.64 1.175.23.39.465.772.705 1.143-.695-.102-1.365-.23-2.006-.386.18-.63.406-1.282.66-1.933zM17.92 16.32c.112.493.2.968.254 1.423.23 1.868-.054 3.32-.714 3.708-.147.09-.338.128-.563.128-1.012 0-2.514-.807-4.11-2.28.686-.72 1.37-1.536 2.02-2.44 1.107-.118 2.154-.3 3.113-.54zm-11.83.01c.96.234 2.006.415 3.107.532.66.905 1.345 1.727 2.035 2.446-1.595 1.483-3.092 2.295-4.11 2.295-.22-.005-.406-.05-.553-.132-.666-.38-.955-1.834-.73-3.703.054-.46.142-.944.25-1.438zm4.56.64c.44.02.89.034 1.345.034.46 0 .915-.01 1.36-.034-.44.572-.895 1.095-1.345 1.565-.455-.47-.91-.993-1.36-1.565z" />
-                </svg>
-              </div>
-              <div className="card-body">
-                <h2 className="text-lg font-medium text-base-content">
-                  Next.js and React
-                </h2>
-                <p className="mt-2 text-base text-base-content/70">
-                  Leverage the power of modern web technologies for optimal
-                  performance and developer experience.
-                </p>
-              </div>
-            </Card>
-            {/* Feature 2 */}
-            <Card>
-              <div className="flex items-center justify-center h-12 w-12 rounded-md bg-orange-500 text-white mt-6 ml-6">
-                {/* Database SVG */}
-                <svg
-                  className="h-6 w-6"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  viewBox="0 0 24 24"
-                >
-                  <ellipse cx="12" cy="5" rx="9" ry="3" />
-                  <path d="M3 5v14c0 1.657 4.03 3 9 3s9-1.343 9-3V5" />
-                  <path d="M3 12c0 1.657 4.03 3 9 3s9-1.343 9-3" />
-                </svg>
-              </div>
-              <div className="card-body">
-                <h2 className="text-lg font-medium text-base-content">
-                  Postgres and Drizzle ORM
-                </h2>
-                <p className="mt-2 text-base text-base-content/70">
-                  Robust database solution with an intuitive ORM for efficient
-                  data management and scalability.
-                </p>
-              </div>
-            </Card>
-            {/* Feature 3 */}
-            <Card>
-              <div className="flex items-center justify-center h-12 w-12 rounded-md bg-orange-500 text-white mt-6 ml-6">
-                {/* Credit Card SVG */}
-                <svg
-                  className="h-6 w-6"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  viewBox="0 0 24 24"
-                >
-                  <rect x="2" y="5" width="20" height="14" rx="2" />
-                  <path d="M2 10h20" />
-                </svg>
-              </div>
-              <div className="card-body">
-                <h2 className="text-lg font-medium text-base-content">
-                  Stripe Integration
-                </h2>
-                <p className="mt-2 text-base text-base-content/70">
-                  Seamless payment processing and subscription management with
-                  industry-leading Stripe integration.
-                </p>
-              </div>
-            </Card>
+      {/* Chess Openings Section */}
+      <section id="openings" className="py-20 bg-gray-900/50">
+        <div className="container mx-auto px-4 lg:px-6">
+          <div className="text-center mb-16">
+            <Badge className="bg-green-500/20 text-green-400 border-green-500/30 mb-4">
+              ✓ Opening Courses
+            </Badge>
+            <h2 className="text-3xl lg:text-5xl font-bold mb-4">
+              Master Every Opening
+            </h2>
+            <p className="text-xl text-gray-400 max-w-2xl mx-auto">
+              From beginner-friendly classics to advanced theoretical lines. 
+              Build your complete opening repertoire with interactive training.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-8">
+            {chessOpenings.map((opening, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                viewport={{ once: true }}
+              >
+                <Card className="bg-gray-800/50 border-gray-700 hover:border-green-500/50 transition-all duration-300 group">
+                  <CardHeader className="pb-4">
+                    <div className="flex items-start justify-between">
+                      <div className="space-y-2">
+                        <CardTitle className="text-xl text-white group-hover:text-green-400 transition-colors">
+                          {opening.name}
+                        </CardTitle>
+                        <div className="flex items-center space-x-2">
+                          <Badge variant="secondary" className="bg-gray-700 text-gray-300">
+                            {opening.lines} lines
+                          </Badge>
+                          <Badge 
+                            className={`${
+                              opening.difficulty === 'Beginner' 
+                                ? 'bg-green-500/20 text-green-400 border-green-500/30'
+                                : opening.difficulty === 'Intermediate'
+                                ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'
+                                : 'bg-red-500/20 text-red-400 border-red-500/30'
+                            }`}
+                          >
+                            {opening.difficulty}
+                          </Badge>
+                        </div>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="bg-black/30 rounded-lg p-4">
+                      <div className="grid grid-cols-8 gap-0.5 mb-3">
+                        {Array.from({ length: 64 }).map((_, i) => (
+                          <div
+                            key={i}
+                            className={`aspect-square rounded-sm ${
+                              (Math.floor(i / 8) + i) % 2 === 0 ? 'bg-amber-100' : 'bg-amber-800'
+                            }`}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                    
+                    <CardDescription className="text-gray-400">
+                      {opening.description}
+                    </CardDescription>
+                    
+                    <Button 
+                      className="w-full bg-transparent border border-green-500/30 text-green-400 hover:bg-green-500 hover:text-black transition-all"
+                    >
+                      Start Learning
+                      <ArrowRight className="w-4 h-4 ml-2" />
+                    </Button>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section id="testimonials" className="py-20 overflow-hidden">
+        <div className="container mx-auto px-4 lg:px-6">
+          <div className="text-center mb-16">
+            <Badge className="bg-green-500/20 text-green-400 border-green-500/30 mb-4">
+              ✓ Testimonials
+            </Badge>
+            <h2 className="text-3xl lg:text-5xl font-bold mb-4">
+              Loved by players worldwide
+            </h2>
+            <p className="text-xl text-gray-400">
+              See what the chess community is saying about Gambitology
+            </p>
+          </div>
+
+          <div className="relative">
+            {/* Blur overlays */}
+            <div className="absolute left-0 top-0 w-32 h-full bg-gradient-to-r from-black via-black/80 to-transparent z-10 pointer-events-none" />
+            <div className="absolute right-0 top-0 w-32 h-full bg-gradient-to-l from-black via-black/80 to-transparent z-10 pointer-events-none" />
+            
+            <div className="space-y-6 overflow-hidden py-2">
+              {testimonialRows.map((row, rowIndex) => (
+                <div key={rowIndex} className="relative">
+                  <div 
+                    className={`flex gap-6 ${
+                      rowIndex % 2 === 0 ? 'animate-scroll-left' : 'animate-scroll-right'
+                    }`}
+                    style={{
+                      width: 'fit-content',
+                    }}
+                  >
+                    {/* Duplicate the row for seamless looping */}
+                    {[...row, ...row].map((testimonial, index) => (
+                      <motion.div
+                        key={`${rowIndex}-${index}`}
+                        className="flex-shrink-0 w-80"
+                      >
+                        <Card className="bg-gray-800/30 border-gray-700 h-[180px] p-0">
+                          <CardContent className="p-6">
+                            <div className="flex items-start space-x-3 mb-4">
+                              <Avatar className="w-10 h-10 flex-shrink-0">
+                                <AvatarImage src={testimonial.avatar || "/placeholder.svg"} />
+                                <AvatarFallback className="bg-green-500 text-black">
+                                  {testimonial.name.split(' ').map(n => n[0]).join('')}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div className="min-w-0">
+                                <div className="font-semibold text-white truncate">{testimonial.name}</div>
+                                <div className="text-sm text-gray-400 truncate">{testimonial.username}</div>
+                              </div>
+                            </div>
+                            <p className="text-gray-300 leading-relaxed text-sm mb-4 line-clamp-2">{testimonial.content}</p>
+                            <div className="flex items-center space-x-1">
+                              {Array.from({ length: 5 }).map((_, i) => (
+                                <Star key={i} className="w-4 h-4 fill-green-400 text-green-400" />
+                              ))}
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-base-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="lg:grid lg:grid-cols-2 lg:gap-8 lg:items-center">
-            <div>
-              <h2 className="text-3xl font-bold text-base-content sm:text-4xl">
-                Ready to launch your SaaS?
-              </h2>
-              <p className="mt-3 max-w-3xl text-lg text-base-content/70">
-                Our template provides everything you need to get your SaaS up
-                and running quickly. Don't waste time on boilerplate - focus on
-                what makes your product unique.
-              </p>
+      <section className="py-20 bg-gradient-to-r from-green-500/10 to-green-600/10 border-y border-green-500/20">
+        <div className="container mx-auto px-4 lg:px-6 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+            className="max-w-3xl mx-auto space-y-8"
+          >
+            <h2 className="text-3xl lg:text-5xl font-bold">
+              Master chess openings and build your winning repertoire today.
+            </h2>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button size="lg" className="bg-green-500 hover:bg-green-600 text-black font-medium">
+                Start Training
+                <ChevronRight className="w-5 h-5 ml-2" />
+              </Button>
+              <Button size="lg" variant="outline" className="border-green-500/30 text-green-400 hover:bg-green-500/10">
+                View on GitHub
+              </Button>
             </div>
-            <div className="mt-8 lg:mt-0 flex justify-center lg:justify-end">
-              <a href="https://github.com/nextjs/saas-starter" target="_blank">
-                <OutlineButton size="lg">
-                  View the code
-                  <svg
-                    className="ml-3 h-6 w-6"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M17 8l4 4m0 0l-4 4m4-4H3"
-                    />
-                  </svg>
-                  </OutlineButton>
-              </a>
-            </div>
-          </div>
+            
+            <p className="text-gray-400 italic">
+              Free to use. Open source.
+            </p>
+          </motion.div>
         </div>
       </section>
 
-      <Footer />
-    </main>
-  );
+      {/* Footer */}
+      <footer className="bg-black border-t border-gray-800">
+        <div className="container mx-auto px-4 lg:px-6 py-12">
+          <div className="grid md:grid-cols-4 gap-8">
+            <div className="space-y-4">
+              <div className="flex items-center space-x-2">
+                <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
+                  <span className="text-black font-bold text-lg">♔</span>
+                </div>
+                <span className="font-bold text-xl">Gambitology</span>
+              </div>
+              <p className="text-gray-400 text-sm max-w-xs">
+                Master chess openings with interactive training and spaced repetition. 
+                Build your winning repertoire.
+              </p>
+              <div className="flex space-x-4">
+                <Github className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer transition-colors" />
+                <Twitter className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer transition-colors" />
+              </div>
+            </div>
+
+            <div>
+              <h3 className="font-semibold text-white mb-4">Product</h3>
+              <div className="space-y-2 text-sm">
+                <Link href="#" className="text-gray-400 hover:text-white block transition-colors">Features</Link>
+                <Link href="#" className="text-gray-400 hover:text-white block transition-colors">Openings</Link>
+                <Link href="#" className="text-gray-400 hover:text-white block transition-colors">Pricing</Link>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="font-semibold text-white mb-4">Resources</h3>
+              <div className="space-y-2 text-sm">
+                <Link href="#" className="text-gray-400 hover:text-white block transition-colors">GitHub</Link>
+                <Link href="#" className="text-gray-400 hover:text-white block transition-colors">Discord</Link>
+                <Link href="#" className="text-gray-400 hover:text-white block transition-colors">Contact</Link>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="font-semibold text-white mb-4">Legal</h3>
+              <div className="space-y-2 text-sm">
+                <Link href="#" className="text-gray-400 hover:text-white block transition-colors">Privacy Policy</Link>
+                <Link href="#" className="text-gray-400 hover:text-white block transition-colors">Terms of Service</Link>
+              </div>
+            </div>
+          </div>
+
+          <div className="border-t border-gray-800 mt-12 pt-8 flex flex-col sm:flex-row justify-between items-center">
+            <p className="text-xs text-gray-400">
+              © 2025 Gambitology. All rights reserved.
+            </p>
+            <p className="text-xs text-gray-400 mt-2 sm:mt-0">
+              Privacy Policy
+            </p>
+          </div>
+        </div>
+      </footer>
+    </div>
+  )
 }
