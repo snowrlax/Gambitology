@@ -126,7 +126,7 @@ const ChessGame = () => {
             // Use the NEW index to set the next expected move
             setExpectedMove(newMoveIndex < pgnMoves.length ? pgnMoves[newMoveIndex] : '');
             setGame(chessGame.fen());
-            
+
             // Return both the result and the new move index for CPU move
             return { moveResult: result, newMoveIndex };
         }
@@ -136,7 +136,7 @@ const ChessGame = () => {
     function makePGNMove(moveIndex?: number) {
         // Use provided moveIndex or current state
         const indexToUse = moveIndex !== undefined ? moveIndex : currentMoveIndex;
-        
+
         if (indexToUse >= pgnMoves.length) {
             setErrorMessage("Game has reached the end of the predefined line.");
             return;
@@ -318,29 +318,9 @@ const ChessGame = () => {
 
     return (
         <main className='flex flex-col items-center justify-center h-screen bg-secondary'>
-            <div className="max-w-2xl w-full mx-auto space-y-4">
-                {/* Game Status */}
-                <div className="text-center">
-                    <h2 className="text-2xl font-bold mb-2">Chess Trainer - Italian Game</h2>
-                    <p className="text-sm text-gray-600">
-                        Move {Math.floor(currentMoveIndex / 2) + 1} - {currentMoveIndex % 2 === 0 ? 'White' : 'Black'} to move
-                    </p>
-                    {currentMoveIndex < pgnMoves.length && (
-                        <p className="text-sm font-medium">
-                            Expected move: <span className="font-mono bg-gray-100 px-2 py-1 rounded">{pgnMoves[currentMoveIndex]}</span>
-                        </p>
-                    )}
-                </div>
-
-                {/* Error Message */}
-                {errorMessage && (
-                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded text-center">
-                        {errorMessage}
-                    </div>
-                )}
-
+            <div className="flex items-center justify-center gap-8 max-w-5xl w-full mx-auto space-y-4">
                 {/* Chess Board */}
-                <div className="border-2 border-gray-300 rounded-lg overflow-hidden">
+                <div className="rounded-lg overflow-hidden w-[60%] h-auto aspect-square">
                     <Chessboard
                         position={game}
                         onSquareClick={onSquareClick}
@@ -349,15 +329,37 @@ const ChessGame = () => {
                         autoPromoteToQueen={true} // always promote to a queen for example simplicity
                     />
                 </div>
+                <div className="flex flex-col items-center justify-center w-[40%] h-full bg-gray-200 border-2 border-gray-400 rounded-lg p-6">
+                    {/* Game Status */}
+                    <div className="text-center">
+                        <h2 className="text-2xl font-bold mb-2">Chess Trainer - Italian Game</h2>
+                        <p className="text-sm text-gray-600">
+                            Move {Math.floor(currentMoveIndex / 2) + 1} - {currentMoveIndex % 2 === 0 ? 'White' : 'Black'} to move
+                        </p>
+                        {currentMoveIndex < pgnMoves.length && (
+                            <p className="text-sm font-medium">
+                                Expected move: <span className="font-mono bg-gray-100 px-2 py-1 rounded">{pgnMoves[currentMoveIndex]}</span>
+                            </p>
+                        )}
+                    </div>
 
-                {/* Game Progress */}
-                <div className="text-center text-sm text-gray-600">
-                    Progress: {currentMoveIndex} / {pgnMoves.length} moves completed
-                    {currentMoveIndex >= pgnMoves.length && (
-                        <div className="mt-2 text-green-600 font-medium">
-                            🎉 Congratulations! You've completed the Italian Game opening!
+                    {/* Error Message */}
+                    {errorMessage && (
+                        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded text-center">
+                            {errorMessage}
                         </div>
                     )}
+
+
+                    {/* Game Progress */}
+                    <div className="text-center text-sm text-gray-600">
+                        Progress: {currentMoveIndex} / {pgnMoves.length} moves completed
+                        {currentMoveIndex >= pgnMoves.length && (
+                            <div className="mt-2 text-green-600 font-medium">
+                                🎉 Congratulations! You've completed the Italian Game opening!
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
         </main>

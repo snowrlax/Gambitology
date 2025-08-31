@@ -90,6 +90,9 @@ model Gambit {
   slug        String   @unique
   description String?
   
+  // Whether this gambit is for white or black side
+  side        String
+  
   tenantId    String   @db.ObjectId
   tenant      Tenant   @relation(fields: [tenantId], references: [id])
   lines       Line[]
